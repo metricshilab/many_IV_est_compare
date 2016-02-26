@@ -15,8 +15,7 @@ tic
 r = 1;
 
 while r <= Rep
-
-    seed_v = seed + r_no_repeat;
+    seed_v = seed + r;
     rng(seed_v);
     
     [y, x, z] = dgpLinearIV(beta0, rho, useful); % generate the data
@@ -26,7 +25,7 @@ while r <= Rep
     % parameter
     
     
-    r
+    r = r + 1;
     toc
 end
 
