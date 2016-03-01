@@ -4,8 +4,10 @@ global n m;
 
 lambda0C = 2.2*sqrt(2*log(2*m*log(n)/.1));
 dim_x = size(x,2);
+%Save the index of optimal instruments for both x1 and x2
 Ind = zeros(m,dim_x);
 
+%For both x1, x2, select optimal instruments by lasso estimator
 for i = 1:dim_x
     
     e0 = x(:,i);
@@ -26,8 +28,9 @@ for i = 1:dim_x
     
 end
 
-ind0 = zeros(m,1);
+ind0 = zeros(m,1); %save the index of all the instruments that are selected
 
+%take union
 for j = 1:dim_x
     ind0 = (ind0 + Ind(:,j) ) - (ind0.*Ind(:,j));
 end
