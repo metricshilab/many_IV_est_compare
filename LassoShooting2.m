@@ -1,4 +1,4 @@
-function [w,wp,m] = LassoShooting2(X, y, lambda,varargin)
+function [w,wp,m] = LassoShooting2(X, y, lambda, varargin)
 % This function computes the Least Squares parameters
 % with a penalty on the L1-norm of the parameters
 %
@@ -11,17 +11,20 @@ function [w,wp,m] = LassoShooting2(X, y, lambda,varargin)
 [maxIter,verbose,optTol,zeroThreshold,beta,XX,Xy] = ...
     process_options(varargin,'maxIter',10000,'verbose',2,'optTol',1e-5,...
     'zeroThreshold',1e-4,'beta',[],'XX',[],'Xy',[]);
-[n p] = size(X);
+
+[n, p] = size(X);
 
 if isempty(XX),
-    XX = X'*X;
+    XX = X'* X;
 end
+
 if isempty(Xy),
-    Xy = X'*y;
+    Xy = X' * y;
 end
+
 if isempty(beta),
     % Start from the Least Squares solution
-    beta = (XX + diag(lambda)*eye(p))\(Xy);
+    beta = (XX + diag(lambda)*eye(p)) \ (Xy);
 else
     beta = beta;
 end
@@ -38,8 +41,6 @@ m = 0;
 XX2 = XX*2;
 Xy2 = Xy*2;
 while m < maxIter
-    
-    
     
     beta_old = beta;
     for j = 1:p
@@ -66,14 +67,16 @@ while m < maxIter
         k=k+1;
         wp(:,k) = beta;
     end
+
     % Check termination
     if sum(abs(beta-beta_old)) < optTol
         break;
     end
     
-    
 end
+
 if verbose
-fprintf('Number of iterations: %d\nTotal Shoots: %d\n',m,m*p);
+    fprintf('Number of iterations: %d\nTotal Shoots: %d\n',m,m*p);
 end
+
 w = beta;

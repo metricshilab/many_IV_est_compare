@@ -1,4 +1,4 @@
-function [beta_2sls, var_2sls, beta_fuller, var_fuller,FS] = post_lasso(y,x,Z)
+function [beta_2sls, var_2sls] = post_lasso(y,x,Z)
 
 global n m;
 
@@ -25,7 +25,6 @@ for i = 1:dim_x
     end
     
     Ind(:,i) = ind1;
-    
 end
 
 ind0 = zeros(m,1); %save the index of all the instruments that are selected
@@ -40,20 +39,20 @@ Z1 = Z(:,logical(ind0));
 if isempty(Z1),
     beta_2sls = NaN;
     var_2sls = NaN;
-    beta_fuller = NaN;
-    var_fuller= NaN;
-    FS = 0;
+    %beta_fuller = NaN;
+    %var_fuller= NaN;
+    %FS = 0;
 else
-    bfs = Z1\x;
-    efs = x - Z1*bfs;
-    Vfs = ((Z1'*Z1)\((Z1.*((efs.^2)*ones(dim_x,sum(ind0))))'*Z1))/(Z1'*Z1);
-    FS = bfs'*(Vfs\bfs)/sum(ind0);
+    %bfs = Z1\x;
+    %efs = x - Z1*bfs;
+    %Vfs = ((Z1'*Z1)\((Z1.*((efs.^2)*ones(dim_x,sum(ind0))))'*Z1))/(Z1'*Z1);
+    %FS = bfs'*(Vfs\bfs)/sum(ind0);
     [btemp1,VCtemp1] = tsls(y,x,[],Z1);
-    [btemp2,~,~,VCtemp2] = fuller(y,x,[],Z1,1);
+    %[btemp2,~,~,VCtemp2] = fuller(y,x,[],Z1,1);
     beta_2sls = btemp1;
     var_2sls = VCtemp1;
-    beta_fuller = btemp2;
-    var_fuller = VCtemp2;
+    %beta_fuller = btemp2;
+    %var_fuller = VCtemp2;
 end
 
 end
