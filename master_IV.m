@@ -1,4 +1,4 @@
-global  n y x z m
+global  n y x z m Rep
 
 Rep = 500; % # of Monte Carlo replication
 n_choice = [120; 240];
@@ -41,32 +41,8 @@ for i = 1:p
             beta_RJIVE(r,i,j) = RJIVE(y, x, z);
         end
         toc
-        %Handle troublesome cases, i.e. the estimation result is inf or
-        %nan, and compute the bias and RMSE for each combination of n, m
-        
-        %For post_lasso
-        if sum( isnan(beta_lasso_2sls(:,i,j) ) ) || sum( isinf(beta_lasso_2sls(:,i,j) ) )
-            beta_temp = beta_lasso_2sls(:,i,j);
-            trouble_ind = logical( isnan(beta_temp) + isinf(beta_temp) );
-            Ind = logical( ones(Rep,1) - trouble_ind );
-            sum( beta_temp(Ind) )
-            bias_lasso_2sls(i,j) = mean( beta_temp(Ind) ) - beta0(1);
-            RMSE_lasso_2sls(i,j) = sqrt( mean( (beta_temp(Ind) - 1) .^2 ) );
-        else
-            bias_lasso_2sls(i,j) = mean( beta_lasso_2sls(:,i,j) ) - beta0(1);
-            RMSE_lasso_2sls(i,j) = sqrt( mean( (beta_lasso_2sls(:,i,j) - 1) .^ 2) );
-        end
-        %For RJIVE
-        if sum( isnan(beta_RJIVE(:,i,j) ) ) || sum( isinf(beta_RJIVE(:,i,j) ) )
-            beta_temp = beta_RJIVE(:,i,j);
-            trouble_ind = logical( isnan(beta_temp) + isinf(beta_temp) );
-            Ind = logical( ones(Rep,1) - trouble_ind );
-            sum( beta_temp(Ind) )
-            bias_RJIVE(i,j) = mean( beta_temp(Ind) ) - beta0(1);
-            RMSE_RJIVE(i,j) = sqrt( mean( (beta_temp(Ind) - 1) .^2 ) );
-        else
-            bias_RJIVE(i,j) = mean( beta_RJIVE(:,i,j) ) - beta0(1);
-            RMSE_RJIVE(i,j) = sqrt( mean( (beta_RJIVE(:,i,j) - 1) .^ 2) );
-        end
+        %Compute the bias and rmse
+        [bias_lasso_2sls(i,j), RMSE_lasso_2sls(i,j)] = output_bias_rmse(beta_lasso_2sls(:,i,j), beta0(1) ); 
+        [bias_RJIVE(i,j), RMSE_RJIVE(i,j)] = output_bias_rmse(beta_RJIVE(:,i,j), beta0(1) );
     end
 end
