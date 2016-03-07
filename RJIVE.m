@@ -5,10 +5,13 @@ function [ beta_rjive ] = RJIVE( y, x, Z )
 global n m;
 dim_x = size(x,2);
 
-%Need to obtain the const C
+%WARNING: the way to compute const C may not be correct
+
+C = mean( std(x) );
+
 
 Lambda_square = C^2 * m * eye(m);
-F1 = zeros(dim_x, dimx);
+F1 = zeros(dim_x, dim_x);
 F2 = zeros(dim_x, 1);
 
 for i = 1:n
