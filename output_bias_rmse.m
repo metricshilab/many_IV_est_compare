@@ -7,8 +7,10 @@ function [ bias, RMSE ] = output_bias_rmse( beta, beta0)
 
 global Rep
 
-if sum( isnan(beta) ) || sum( isinf(beta) )
-    trouble_ind = logical( isnan(beta) + isinf(beta) );
+outlier_std = 15;
+
+if sum( isnan(beta) ) || sum( isinf(beta) ) || sum( (abs( beta - beta0 ) > outlier_std) )
+    trouble_ind = logical( isnan(beta) + isinf(beta)  + (abs(beta - beta0) > outlier_std) );
     Ind = logical( ones(Rep,1) - trouble_ind );
     bias = mean( beta(Ind) ) - beta0;
     RMSE = sqrt( mean( (beta(Ind) - beta0) .^2 ) );
