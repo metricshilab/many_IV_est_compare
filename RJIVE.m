@@ -25,4 +25,3 @@ beta_hat = F1 \ F2;
 beta_rjive = beta_hat(1);
 
 end
-
