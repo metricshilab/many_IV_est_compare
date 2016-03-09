@@ -5,7 +5,8 @@ function [ beta_rjive ] = RJIVE( y, x, Z )
 global n m;
 dim_x = size(x,2);
 
-C = mean( std(x) );%compute the const C
+C = std( (eye(n) - x * inv(x' * x) * x') * y ); %compute the const C
+
 Lambda_square = C^2 * m * eye(m);
 %based on the closed form of the estimator: beta_hat = ( F1 )^(-1) * F2
 F1 = zeros(dim_x, dim_x);
