@@ -67,8 +67,8 @@ C = \sqrt{\frac{1}{n-1}\sum\limits_{i=1}^{n}(\varepsilon_i - \bar{\varepsilon})^
 The master file is \textbf{master\_IV.m}. For each combination of $n$ and $m$, we fix the seed of random number generator and simulate both post-Lasso estimator and Regularized JIVE for 500 replications. We report only the estimation of the first parameter $\beta_1$.\\
 \noindent After obtain the estimation result, we use the function \textbf{output\_bias\_rmse.m} to compute the bias and RMSE. In the function, we firstly check if there are any outliers to ensure
 \begin{enumerate}
-	\item the estimation $\hat{\beta}_1$ is not infinity or NaN.
-	\item the estimation is not too far away to ruin the overall performance of the estimator, i.e. $ |\hat{\beta}_1 - \beta_{1,0} | < 15$.
+	\item the estimated value $\hat{\beta}_1$ is not infinity or NaN.
+	\item the estimated value is not so far away from the true value to avoid ruining the overall performance of the estimator, i.e. $ |\hat{\beta}_1 - \beta_{1,0} | < 15$.
 \end{enumerate}
 Based on the criteria, we dropped 2 outliers when $(n,m) = (120,80)$ using post-Lasso and 5 outliers when $(n,m) = (120,160)$ using post-Lasso. Under other circumstances, no outliers are detected.\\
 
