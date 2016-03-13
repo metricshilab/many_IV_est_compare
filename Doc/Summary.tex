@@ -6,32 +6,6 @@
 \usepackage{amsmath}
 \usepackage{multirow}
 
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
-
-\lstdefinestyle{codestyle}{
-	backgroundcolor=\color{backcolour},   
-	commentstyle=\color{codegreen},
-	keywordstyle=\color{magenta},
-	numberstyle=\tiny\color{codegray},
-	stringstyle=\color{codepurple},
-	basicstyle=\footnotesize,
-	breakatwhitespace=false,         
-	breaklines=true,                 
-	captionpos=b,                    
-	keepspaces=true,                 
-	numbers=left,                    
-	numbersep=5pt,                  
-	showspaces=false,                
-	showstringspaces=false,
-	showtabs=false,                  
-	tabsize=2
-}
-
-\lstset{style=codestyle}
-
 %opening
 \title{Summary of the Simulation Work}
 \author{}
@@ -104,7 +78,7 @@ Based on the criteria, we dropped 2 outliers when $(n,m) = (120,80)$ using post-
 	\hline
 	&(n,m) & (120,80) & (120,160) & (240,80) & (240,160)\\
 	\hline
-	\multirow{2}{0pt}{post-Lasso} & bias & 0.0301 & 0.0123 &	0.0003 & 0.0020\\
+	\multirow{2}{0pt}{post-Lasso} & bias & 0.0301 & 0.0122 &	0.0003 & 0.0020\\
 	& RMSE & 0.5963 & 0.7255 & 0.0417 & 0.0416\\
 	\hline
 	\multirow{2}{0pt}{RJIVE} & bias & -0.0136 & -0.0321 & -0.0062 & -0.0052\\
