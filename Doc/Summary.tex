@@ -1,0 +1,120 @@
+\documentclass[12pt, a4paper]{article}
+
+\usepackage{apacite}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{multirow}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{codestyle}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2
+}
+
+\lstset{style=codestyle}
+
+%opening
+\title{Summary of the Simulation Work}
+\author{}
+
+\begin{document}
+
+\maketitle
+
+This project is intended to compare the performance of post-Lasso \cite{bcch} and RJIVE \cite{rjive} with REL and BC-REL \cite{rel} in a linear IV model. We summarize the data generating process of the simulation, implementation of post-Lasso and RJIVE on generated data and the simulation result in this short summary.  
+
+\subsubsection*{Data Generating Process}
+
+The data generating process we adopt in this simulation work is from the B.4 section of Shi (2015). The data is generate as follows.
+\\
+
+\noindent The structural equation is 
+\begin{equation}
+e_i^{(0)} = y_i - (x_{i1}, x_{i2})\beta
+\end{equation}
+where $e_i^{(0)}$ is the structural error and $(x_{i1}, x_{i2})$ and two endogenous variables. The true reduced-form equations for the endogenous variables are
+\begin{equation}
+x_{i1} = 0.5z_{i1} + 0.5 z_{i2} + e_i^{(1)}
+\end{equation}
+\begin{equation}
+x_{i2} = 0.5z_{i3} + 0.5 z_{i4} + e_i^{(2)}
+\end{equation}
+where $(e_i^{1},e_i^{2})$ are the reduced-form errors and each endogenous variables is supported by two relevant IVs from a large number of IVs $(z_{ij})^m_{j=1}$ orthogonal to the structural error. We generate $(z_{ij})^m_{j=1} \sim i.i.d \, N(0,1)$ and 
+\begin{equation} 
+\begin{bmatrix} e_i^{(0)} \\ e_i^{(1)} \\ e_i^{(2)} \end{bmatrix} \sim N\Bigg(\begin{bmatrix} 0\\0\\0 \end{bmatrix} , 0.25\begin{bmatrix} 1&rho&rho\\rho&1&1\\rho&0&1 \end{bmatrix}\Bigg)
+\end{equation}
+where $rho$ stands for the magnitude of endogeneity.\\
+
+\noindent In the simulation we try combinations of dimensionality $n = 120 \, or \, 240$ and $m = 80 \, or \, 160$ and set the $rho = 0.6$ and $\beta_0 = (1,1)'$. The DGP script is \textbf{dgpLinearIV.m}, whose outputs are the dependent variable $y$ ($n \times 1$), endogenous variable $x$ ($n \times 2$) and instruments $Z$ ($n \times m$).
+\subsubsection*{Post-Lasso}
+
+The script \textbf{post\_lasso.m} implements the post-lasso estimation on the generated data and output $\hat{\beta}$. This function is a modified version of the original codes provided by authors of the paper\cite{bcch}. Tuning parameters we used in the function are same as the original codes. We firstly select instruments for each endogenous variables by Lasso using the function \textbf{LassoShooting2.m} and then run two-stage-least-square regression including the selected instruments by \textbf{tsls.m}. These two functions are provided by the authors\cite{bcch}.\\
+\noindent To drive \textbf{LassoShooting2.m}, we need two supportive scripts \textbf{prepareArgs.m} and \textbf{process\_options.m}.
+
+\subsubsection*{Regularized JIVE}
+
+The script \textbf{RJIVE.m} implements the regularized JIVE estimator. According to Hansen and Kozbur (2014), the ridge-regularized JIVE estimator is defined as
+\begin{equation}
+\tilde{\beta} = (\sum\limits^n_{i = 1} \hat{\Pi}_{-i}^{\wedge'}Z_iX_i')^{-1}(\sum\limits^n_{i = 1} \hat{\Pi}_{-i}^{\wedge'}Z_iy_i)
+\end{equation}
+where 
+\begin{equation}
+\hat{\Pi}_{-i}^{\wedge} = (Z'Z - Z_iZ_i' + \wedge'\wedge)^{-1}(Z'X - Z_iX_i')\quad and \quad \wedge'\wedge = C^2mI_n
+\end{equation}
+Following the footnote on page 295 of the paper\cite{rjive}, the tuning parameter $C$ is the standard deviation of the residuals obtained by regressing $X$ on a column of ones, that is
+\begin{equation}
+\varepsilon = (I_n - X(X'X)^{-1}X')\begin{bmatrix} 1&1&\cdots&1\end{bmatrix}'
+\end{equation}
+and
+\begin{equation}
+C = \sqrt{\frac{1}{n-1}\sum\limits_{i=1}^{n}(\varepsilon_i - \bar{\varepsilon})^2}
+\end{equation}
+
+\subsubsection*{Simulation Results}
+The master file is \textbf{master\_IV.m}. For each combination of $n$ and $m$, we fix the seed of random number generator and simulate both post-Lasso estimator and Regularized JIVE for 500 replications. We report only the estimation of the first parameter $\beta_1$.\\
+\noindent After obtain the estimation result, we use the function \textbf{output\_bias\_rmse.m} to compute the bias and RMSE. In the function, we firstly check if there are any outliers to ensure
+\begin{enumerate}
+	\item the estimation $\hat{\beta}_1$ is not infinity or NaN.
+	\item the estimation is not too far away to ruin the overall performance of the estimator, i.e. $ |\hat{\beta}_1 - \beta_{1,0} | < 15$.
+\end{enumerate}
+Based on the criteria, we dropped 2 outliers when $(n,m) = (120,80)$ using post-Lasso and 5 outliers when $(n,m) = (120,160)$ using post-Lasso. Under other circumstances, no outliers are detected.\\
+
+\noindent The simulation result is summarized in the following table:\\
+
+\begin{tabular}{ |p{1.5cm}|p{1.8cm}|p{1.8cm}|p{1.8cm}|p{1.8cm}|p{1.8cm}|  }
+	\hline
+	&(n,m) & (120,80) & (120,160) & (240,80) & (240,160)\\
+	\hline
+	\multirow{2}{0pt}{post-Lasso} & bias & 0.0301 & 0.0123 &	0.0003 & 0.0020\\
+	& RMSE & 0.5963 & 0.7255 & 0.0417 & 0.0416\\
+	\hline
+	\multirow{2}{0pt}{RJIVE} & bias & -0.0136 & -0.0321 & -0.0062 & -0.0052\\
+	& RMSE & 0.1006 & 0.1980 & 0.0482 &	0.0625\\
+	\hline
+\end{tabular}
+
+\newpage
+\bibliographystyle{apacite}
+\bibliography{sample}
+
+
+\end{document}
