@@ -72,6 +72,15 @@ The master file is \textbf{master\_IV.m}. For each combination of $n$ and $m$, w
 \end{enumerate}
 Based on the criteria, we dropped 2 outliers when $(n,m) = (120,80)$ using post-Lasso and 5 outliers when $(n,m) = (120,160)$ using post-Lasso. Under other circumstances, no outliers are detected.\\
 
+\noindent Then we compute the bias and RMSE by
+
+\begin{equation}
+bias =\frac{1}{R}\sum\limits_{r = 1}^R\hat{\beta}_1^{(r)} - \beta_{1,0}^{(r)}
+\end{equation}
+\begin{equation}
+RMSE = \sqrt{\frac{1}{R}\sum\limits_{r=1}^R(\hat{\beta}_1^{(r)} - \beta_{1,0}^{(r)})^2}
+\end{equation}
+
 \noindent The simulation result is summarized in the following table:\\
 
 \begin{tabular}{ |p{1.5cm}|p{1.8cm}|p{1.8cm}|p{1.8cm}|p{1.8cm}|p{1.8cm}|  }
