@@ -1,4 +1,4 @@
-function [ bias, RMSE ] = output_bias_rmse( beta, beta0)
+function [ bias, RMSE, num_outlier ] = output_bias_rmse( beta, beta0)
 
 %This function is designed to calculate the bias and RMSE for the
 %estimation result. Since there is some chances for the dgp to generate some
@@ -14,9 +14,11 @@ if sum( isnan(beta) ) || sum( isinf(beta) ) || sum( (abs( beta - beta0 ) > outli
     Ind = logical( ones(Rep,1) - trouble_ind );%index of troublesome results
     bias = mean( beta(Ind) ) - beta0;
     RMSE = sqrt( mean( (beta(Ind) - beta0) .^2 ) );
+    num_outlier = sum( trouble_ind );
 else
     bias = mean( beta ) - beta0;
     RMSE = sqrt( mean( (beta - beta0) .^ 2) );
+    num_outlier = 0;
 end
 
 
