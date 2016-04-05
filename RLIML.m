@@ -15,18 +15,20 @@ for k = 1:m
     psi(:,k) = Z * ve(:,k) * sqrt( va(k) )^(-1);
 end
 tra = zeros(T,2);
-cvt = zeros(T,1);
 stl = zeros(T,1);
 COV = zeros(p,p,T);
+options = optimoptions('fmincon','Algorithm','interior-point','MaxIter',5000,'MaxFunEvals',5000);
 
 %LIML%
 P = Z * inv(Z'*Z) * Z';
 b_2sls = (x' * P * x) \ (x' * P * y);
 f = @(y,x,P,d) ( (y - x*d)' * P * (y - x*d) )/( (y - x*d)' * (y - x*d) );
-[~, nu] = fminsearch(@(d)f(y,x,P,d), b_2sls, optimset('MaxIter',5000,'MaxFunEvals',5000));
+
+[~, nu] = fmincon(@(d)f(y,x,P,d), b_2sls,[], [], [], [], -4*ones(2,1), 6*ones(2,1),[], options);
 b_liml = (x' * ( P - nu*eye(n) ) * x) \ (x' * ( P - nu*eye(n) ) * y) ;
 
 %Tikhonov
+ind = 1;
 for t = 1:T
     alpha = alpha_grid(t);
     vv = (va2 + alpha).^(-1);
@@ -36,13 +38,20 @@ for t = 1:T
     tra(t,:) = [ sum(diag(Pa)), sum( diag( Pa*Pa ) ) ];
     %The case in Carrasco and Tchuente(2015) is a scalar case, the variance
     %is easy to compare. Now we consider two endogenous variables, the
-    %covariance is a 2 by 2 matrix. Store the largest eigenvalue of the cov
-    %matrix
+    %covariance is a 2 by 2 matrix. We compare two matrices A and B by
+    %determine whether A - B is a positive definite matrix.
     COV(:,:,t) = (u' * u / n) / (1 - sum( diag(Pa) ) / n)^2;
-    cvt(t) = max( eig(COV(:,:,t)) );
+    if t == 1
+        cvt_min = COV(:,:,t);
+    else
+        [~,pvedef] = chol( cvt_min - COV(:,:,t) );
+        if pvedef == 0
+            cvt_min = COV(:,:,t);
+            ind = t;
+        end
+    end
 end
 
-[~, ind] = min(cvt);
 alpha = alpha_grid(ind);
 vd = (va2 + alpha).^(-1);
 vc1 = repmat( va2 .* vd, n, 1);
@@ -66,8 +75,7 @@ alpha_opt_l = alpha_grid(ind);
 vol=(va2 + alpha_opt_l).^(-1);
 vc2l = repmat( va2 .* vol, n, 1);
 Paol = (psi .* vc2l) * psi' / n;    %Kn_alpha inverse
-
-[~, mut]=fminsearch(@(d)f(y,x,Paol,d),b_liml,optimset('MaxIter',5000,'MaxFunEvals',5000));
+[~, mut] = fmincon(@(d)f(y,x,Paol,d), b_liml,[], [], [], [], -4*ones(2,1), 6*ones(2,1),[], options);
 beta_Rliml_T =  (x' * (Paol - mut*eye(n) ) * x) \ (x'* (Paol - mut*eye(n) ) * y);
 beta = beta_Rliml_T(1);
 end
