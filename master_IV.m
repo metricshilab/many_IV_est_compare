@@ -14,10 +14,16 @@ beta0 = [1;1]; % column vector. Good.
 %set up variables to store the estimation result
 beta_lasso_2sls = zeros(Rep,p,q);
 beta_RJIVE = zeros(Rep,p,q);
+beta_Rliml = zeros(Rep,p,q);
 bias_lasso_2sls = zeros(p,q);
 bias_RJIVE = zeros(p,q);
+bias_Rliml = zeros(p,q);
 RMSE_lasso_2sls = zeros(p,q); 
 RMSE_RJIVE = zeros(p,q);
+RMSE_Rliml = zeros(p,q);
+num_outlier_lasso_2sls = zeros(p,q);
+num_outlier_RJIVE = zeros(p,q);
+num_outlier_Rliml = zeros(p,q);
 
 
 for i = 1:p
@@ -39,10 +45,12 @@ for i = 1:p
             [b_lasso_temp,var_lasso_temp] = post_lasso(y, x, z);
             beta_lasso_2sls(r,i,j) = b_lasso_temp(1); 
             beta_RJIVE(r,i,j) = RJIVE(y, x, z);
+            beta_Rliml(r,i,j) = Rliml(y,x,z);
         end
         toc
         %Compute the bias and rmse
-        [bias_lasso_2sls(i,j), RMSE_lasso_2sls(i,j)] = output_bias_rmse(beta_lasso_2sls(:,i,j), beta0(1) ); 
-        [bias_RJIVE(i,j), RMSE_RJIVE(i,j)] = output_bias_rmse(beta_RJIVE(:,i,j), beta0(1) );
+        [bias_lasso_2sls(i,j), RMSE_lasso_2sls(i,j), num_outlier_lasso_2sls(i,j)] = output_bias_rmse(beta_lasso_2sls(:,i,j), beta0(1) ); 
+        [bias_RJIVE(i,j), RMSE_RJIVE(i,j), num_outlier_RJIVE(i,j)] = output_bias_rmse(beta_RJIVE(:,i,j), beta0(1) );
+        [bias_Rliml(i,j), RMSE_Rliml(i,j), num_outlier_Rliml(i,j)] = output_bias_rmse(beta_Rliml(:,i,j), beta0(1) );
     end
 end
