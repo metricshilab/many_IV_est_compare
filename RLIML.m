@@ -38,8 +38,8 @@ for t = 1:T
     %is easy to compare. Now we consider two endogenous variables, the
     %covariance is a 2 by 2 matrix. Store the largest eigenvalue of the cov
     %matrix
-     COV(:,:,t) = (u' * u / n) / (1 - sum( diag(Pa) ) / n)^2;
-     cvt(t) = max( eig(COV(:,:,t)) );
+    COV(:,:,t) = (u' * u / n) / (1 - sum( diag(Pa) ) / n)^2;
+    cvt(t) = max( eig(COV(:,:,t)) );
 end
 
 [~, ind] = min(cvt);
