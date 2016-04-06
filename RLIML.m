@@ -1,7 +1,12 @@
 function [ beta ] = Rliml( y, x, Z )
 
+%This function implements regularized LIML estimation based on Tikhonov
+%regularization. It is basicly a modification of the original code written
+%by the authors (Carrasco and Tchuente, 2015).
+
 global m n
 [~,p] = size(x);
+%grid of values of alpha in Tikhonov
 alpha_grid = (0.01:0.01:0.05)'; 
 T = length(alpha_grid);
 K_n = Z' * Z / n;
@@ -17,17 +22,24 @@ end
 tra = zeros(T,2);
 stl = zeros(T,1);
 COV = zeros(p,p,T);
+%Unlike the original code by the authors, we use fmincon function instead
+%of fminsearch function to do the optimization step.
 options = optimoptions('fmincon','Algorithm','interior-point','MaxIter',5000,'MaxFunEvals',5000);
 
-%LIML%
+%% LIML
 P = Z * inv(Z'*Z) * Z';
 b_2sls = (x' * P * x) \ (x' * P * y);
+%The function handle of the objective function. This script does not need the
+%the obj_fun.m function outside unlike the original code.
 f = @(y,x,P,d) ( (y - x*d)' * P * (y - x*d) )/( (y - x*d)' * (y - x*d) );
-
+%Using the 2sls estimation as the initial value to do optimization.
+%set upper bound and lower bound to avoid crazy cases
 [~, nu] = fmincon(@(d)f(y,x,P,d), b_2sls,[], [], [], [], -4*ones(2,1), 6*ones(2,1),[], options);
 b_liml = (x' * ( P - nu*eye(n) ) * x) \ (x' * ( P - nu*eye(n) ) * y) ;
 
-%Tikhonov
+%% Tikhonov
+%Except for special indication, this part of code is simply a copy of part of the
+%original code to obtain P^alpha under Tikhonov regularization.
 ind = 1;
 for t = 1:T
     alpha = alpha_grid(t);
@@ -74,8 +86,10 @@ alpha_opt_l = alpha_grid(ind);
 
 vol=(va2 + alpha_opt_l).^(-1);
 vc2l = repmat( va2 .* vol, n, 1);
-Paol = (psi .* vc2l) * psi' / n;    %Kn_alpha inverse
+%Kn_alpha inverse
+Paol = (psi .* vc2l) * psi' / n;    
+%% Implement regularized LIML estimation
 [~, mut] = fmincon(@(d)f(y,x,Paol,d), b_liml,[], [], [], [], -4*ones(2,1), 6*ones(2,1),[], options);
 beta_Rliml_T =  (x' * (Paol - mut*eye(n) ) * x) \ (x'* (Paol - mut*eye(n) ) * y);
-beta = beta_Rliml_T(1);
+beta = beta_Rliml_T(1); %report only the first parameter
 end
