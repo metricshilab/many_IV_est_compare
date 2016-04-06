@@ -63,6 +63,20 @@ and
 C = \sqrt{\frac{1}{n-1}\sum\limits_{i=1}^{n}(\varepsilon_i - \bar{\varepsilon})^2}
 \end{equation}
 
+\subsubsection*{Regularized LIML}
+
+The script Rliml.m implements the regularized LIML estimator proposed by Carrasco and Tchuente (2015). The code is mainly a modification of relevant pieces of the original code adopting Tikhonov regularization written by the authors\cite{rliml}.\\
+\noindent Regularized LIML is defined as 
+\begin{equation}
+\hat{\beta} = (X'(P^\alpha - \nu I_n)X)^{-1}X'(P^\alpha - \nu I_n)y
+\end{equation}
+where
+\begin{equation}
+\nu = \nu_\alpha = \min\limits_{\beta} \frac{(y-X\beta)'P^\alpha(y-X\beta)}{(y-X\beta)'(y-X\beta)}
+\end{equation}
+We construct the matrix $P^\alpha$ following the procedure in authors' original code. In the optimization step, we make use of 'fmincon' function, set the initial value as the estimation of $\beta$ from LIML, $\hat{\beta}_{LIML}$, algorithm as interior point algorithm. To avoid that too many estimation results are outliers, we set an upper bound $(6,6)'$ and a lower bound $(-4,-4)'$ for the optimization result in the options of 'fmincon' function.
+
+
 \subsubsection*{Simulation Results}
 The master file is \textbf{master\_IV.m}. For each combination of $n$ and $m$, we fix the seed of random number generator and simulate both post-Lasso estimator and Regularized JIVE for 500 replications. We report only the estimation of the first parameter $\beta_1$.\\
 \noindent After obtain the estimation result, we use the function \textbf{output\_bias\_rmse.m} to compute the bias and RMSE. In the function, we firstly check if there are any outliers to ensure
@@ -92,6 +106,9 @@ RMSE = \sqrt{\frac{1}{R}\sum\limits_{r=1}^R(\hat{\beta}_1^{(r)} - \beta_{1,0}^{(
 	\hline
 	\multirow{2}{0pt}{RJIVE} & bias & -0.0136 & -0.0321 & -0.0062 & -0.0052\\
 	& RMSE & 0.1006 & 0.1980 & 0.0482 &	0.0625\\
+	\hline
+	\multirow{2}{0pt}{RLIML} & bias & -0.0019 & 0.2529 & -0.0026 & -0.0015\\
+	& RMSE & 0.0694 & 0.9574 & 0.0434 &	0.0470\\
 	\hline
 \end{tabular}
 
