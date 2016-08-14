@@ -95,23 +95,6 @@ bias =\frac{1}{R}\sum\limits_{r = 1}^R\hat{\beta}_1^{(r)} - \beta_{1,0}^{(r)}
 RMSE = \sqrt{\frac{1}{R}\sum\limits_{r=1}^R(\hat{\beta}_1^{(r)} - \beta_{1,0}^{(r)})^2}
 \end{equation}
 
-\noindent The simulation result is summarized in the following table:\\
-
-\begin{tabular}{ |p{1.5cm}|p{1.8cm}|p{1.8cm}|p{1.8cm}|p{1.8cm}|p{1.8cm}|  }
-	\hline
-	&(n,m) & (120,80) & (120,160) & (240,80) & (240,160)\\
-	\hline
-	\multirow{2}{0pt}{post-Lasso} & bias & 0.0301 & 0.0122 &	0.0003 & 0.0020\\
-	& RMSE & 0.5963 & 0.7255 & 0.0417 & 0.0416\\
-	\hline
-	\multirow{2}{0pt}{RJIVE} & bias & -0.0136 & -0.0321 & -0.0062 & -0.0052\\
-	& RMSE & 0.1006 & 0.1980 & 0.0482 &	0.0625\\
-	\hline
-	\multirow{2}{0pt}{RLIML} & bias & -0.0019 & 0.2529 & -0.0026 & -0.0015\\
-	& RMSE & 0.0694 & 0.9574 & 0.0434 &	0.0470\\
-	\hline
-\end{tabular}
-
 \newpage
 \bibliographystyle{apacite}
 \bibliography{sample}
